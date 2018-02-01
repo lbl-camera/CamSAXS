@@ -60,7 +60,7 @@ PyObject *qpqv(PyObject *self, PyObject *args) {
             double qp = Qp[j];
             
             double sin_al = (qv/p.k0) - sin_ai;
-            double cos_al = 1. - (sin_al * sin_al);
+            double cos_al = std::sqrt(1. - (sin_al * sin_al));
             double t1 = pow(cos_al,2) + pow(cos_ai,2) - pow(qp/p.k0,2);
             double t2 = 2. * cos_al * cos_ai;
             if (t1 >= t2)/* cos(theta) > 1 */ {
