@@ -1,6 +1,7 @@
 #include <Python.h>
-#include "npy.h"
 #include <iostream>
+
+#include "npy.h"
 
 #include "util.h"
 #include "cWarpImage.h"
