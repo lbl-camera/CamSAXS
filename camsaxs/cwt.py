@@ -1,6 +1,9 @@
 #! /usr/bin/env python
 # -*- coding: utf-8 -*-
 
+import numpy as np
+from scipy import signal
+
 
 def tophat2d(radius, width=10):
     """
@@ -27,7 +30,7 @@ def tophat2d(radius, width=10):
     return w
 
 
-def cwt2d(image, domain=None, width=None, log=False):
+def cwt2d(image, domain=None, width=1, log=False):
     """
     continuous wavelets transform for finding rings in a SAXS calibration image
 
@@ -56,15 +59,17 @@ def cwt2d(image, domain=None, width=None, log=False):
         rmax = domain[1]
     maxval = 0
     center = np.array([0, 0], dtype=np.int)
-
+    radius = -1
     # if log is true
-    if log: sig = np.log(image)
-    else: sig = image
+    if log: 
+        sig = np.log(image+4).copy()
+    else: sig = image.copy()
 
     for r in range(rmin, rmax):
-        w = tophat2(r, width)
+        w = tophat2d(r, width)
         im2 = signal.fftconvolve(sig, w, 'same')
         if im2.max() > maxval:
             maxval = im2.max()
             center = np.unravel_index(im2.argmax(), image.shape)
-    return center
+            radius = r
+    return center, radius
