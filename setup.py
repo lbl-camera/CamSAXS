@@ -23,6 +23,7 @@ if __name__ == '__main__':
         author='Dinesh Kumar',
         author_email='dkumar@lbl.gov',
         ext_modules = [ext],
+        install_requires = ['numpy', 'scipy'],
         packages = ['camsaxs']
 
     )
