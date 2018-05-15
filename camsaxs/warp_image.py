@@ -5,7 +5,7 @@
 """
 import numpy as np
 
-def qp_qz(image, qp, qz, pixel, center, alphai, k0, dist, method):
+def warp_image(image, qp, qz, pixel, center, alphai, k0, dist, method):
     # find reverse map for every pair or qp,qz
     sin_al = qz / k0 - np.sin(alphai)
     cos_al = np.sqrt(1 - sin_al**2)
@@ -13,9 +13,10 @@ def qp_qz(image, qp, qz, pixel, center, alphai, k0, dist, method):
         tan_al = sin_al / cos_al
 
     cos_ai = np.cos(alphai)
-    with np.errstate(invalid='ignore'):
+    with np.errstate(divide='ignore'):
         cos_th = (cos_al**2 + cos_ai**2 - (qp / k0)**2) / (2 * cos_al * cos_ai)
-    sin_th = np.sign(qp) * np.sqrt(1 - cos_th**2)
+    with np.errstate(invalid='ignore'):
+        sin_th = np.sign(qp) * np.sqrt(1 - cos_th**2)
     with np.errstate(divide='ignore', invalid='ignore'):
         tan_th = sin_th / cos_th
 
@@ -23,66 +24,38 @@ def qp_qz(image, qp, qz, pixel, center, alphai, k0, dist, method):
     with np.errstate(divide='ignore'):
         map_y = ((tan_al * dist / cos_th + center[1]) / pixel[1])
 
+    # get forbidden locations
     mask = np.isnan(map_x) | np.isnan(map_y)
-    map_x = map_x.astype(int).tolist()
-    map_y = map_y.astype(int).tolist()
-    q_image = np.fromiter([
-        image[i,j] if mask[i,j] else 0. for i, j in zip(map_x,map_y)
-    ], np.float)
-    return q_image.reshape(mask.shape)
+    rows,cols = image.shape
 
+    # remove nans
+    map_x[mask] = 0
+    map_y[mask] = 0
 
-def qy_qz(image, qy, qz, pixel, center, alphai, k0, dist, method):
-    sin_al = qz / k0 - np.sin(alphai)
-    cos_al = np.sqrt(1 - sin_al**2)
-    sin_th = qy / (k0 * cos_al)
-    cos_th = np.sqrt(1 - sin_th**2)
+    # mask out of range values
+    mask[(map_x < 0)|(map_x > cols-1)] = True
+    mask[(map_y < 0)|(map_y > rows-1)] = True
 
-    with np.errstate(divide='ignore'):
-        tan_al = sin_al / cos_al
+    # remove out of range values
+    map_x[mask] = 0
+    map_y[mask] = 0
 
-    with np.errstate(divide='ignore'):
-        tan_th = sin_th / cos_th
-
-    map_x = ((tan_th * dist + center[0]) / pixel[0])
-    with np.errstate(divide='ignore'):
-        map_y = ((tan_al * dist / cos_th + center[1]) / pixel[1])
-
-    mask = np.isfinite(map_x) & np.isfinite(map_y)
-    map_x = map_x.astype(int).tolist()
-    map_y = map_y.astype(int).tolist()
-    q_image = np.fromiter([
-        image[i, j] if mask[i, j] else 0. for i, j in zip([map_y, map_x])
-    ], np.float)
-    return q_image.reshape(mask.shape)
-
-
-def theta_alpha(image, theta, alpha, pixel, center, alphai, k0, dist, method):
-    tan_th = np.tan(theta)
-    cos_th = np.cos(theta)
-    tan_al = np.tan(alpha)
-    map_x = (tan_th * dist + center[0]) / pixel[0]
-
-    with np.errstate(divide='ignore'):
-        map_y = (tan_al * dist / cos_th + center[1]) / pixel[1]
-
-    mask = np.isfinite(map_x) & np.isfinite(map_y)
-    map_x = map_x.astype(int).tolist()
-    map_y = map_y.astype(int).tolist()
-    q_image = np.fromiter([
-        image[i, j] if mask[i, j] else 0. for i, j in zip([map_y, map_x])
-    ], np.float)
-    return q_image.reshape(mask.shape)
+    # flatten and convert to list of integers
+    map_x = map_x.astype(int).ravel().tolist()
+    map_y = map_y.astype(int).ravel().tolist()
+    q_image = np.fromiter([image[i,j] for i,j in zip(map_y,map_x)], np.float).reshape(qp.shape)
+    q_image[mask] = 0.
+    return q_image
 
 
 def x2angles(x, y, d):
     s1 = np.sqrt(d**2 + x**2)
-    theta = np.arctan2(d, x)
-    alpha = np.arctan2(s1, y)
+    theta = np.arctan2(x, d)
+    alpha = np.arctan2(y, s1)
     return theta, alpha
 
 
-def x2q(x, y, d, alphai, k0):
+def pixel2q(x, y, d, alphai, k0):
     s1 = np.sqrt(x**2 + d**2)
     s2 = np.sqrt(s1**2 + y**2)
     sin_th = x / s1
