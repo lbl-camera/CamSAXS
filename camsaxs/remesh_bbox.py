@@ -103,7 +103,7 @@ def remesh(image: np.ndarray,
         q_h = q_r
         q_v = q_z
     else:
-        alphas = alpha(r_x, r_y, r_z) - alphai
+        alphas = alpha(r_x, r_y, r_z)
         phis = phi(r_x, r_y, r_z)
 
         q_x, q_y, q_z = q_from_angles(phis, alphas, geometry.wavelength)*1e-10
@@ -133,7 +133,7 @@ def remesh(image: np.ndarray,
                                               # chiDiscAtPi=self.chiDiscAtPi,
                                               # empty=dummy if dummy is not None else self._empty
                                               )
-    return np.flipud(I)
+    return I, q_h, q_v
 
 
 if __name__ == '__main__':
