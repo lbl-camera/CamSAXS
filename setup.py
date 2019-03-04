@@ -7,8 +7,7 @@ if __name__ == '__main__':
         description='Xi-cam.SAXS companion functions',
         author='Dinesh Kumar',
         author_email='dkumar@lbl.gov',
-        ext_modules = [ext],
-        install_requires = ['numpy', 'scipy', 'astropy'],
+        install_requires = ['numpy', 'scipy', 'astropy', 'pyFAI'],
         packages = ['camsaxs']
 
     )
