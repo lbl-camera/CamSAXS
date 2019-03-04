@@ -8,6 +8,7 @@ if __name__ == '__main__':
         author='Dinesh Kumar',
         author_email='dkumar@lbl.gov',
         install_requires = ['numpy', 'scipy', 'astropy', 'pyFAI', 'sasmodels'],
-        packages = ['camsaxs']
+        packages = ['camsaxs'],
+        data_files=[('camsaxs', ['camsaxs/config.yml'])]
 
     )
