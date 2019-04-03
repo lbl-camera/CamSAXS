@@ -114,7 +114,7 @@ def remesh(image: np.ndarray,
     if q_h_range is None: q_h_range = (q_h.min(), q_h.max())
     if q_v_range is None: q_v_range = (q_v.min(), q_v.max())
 
-    I, q_y, q_z, _, _ = splitBBox.histoBBox2d(weights=image,
+    I, q_h, q_v, _, _ = splitBBox.histoBBox2d(weights=image,
                                               pos0=q_h,
                                               delta_pos0=np.ones_like(image) * (q_h_range[1] - q_h_range[0]) / bins[0],
                                               pos1=q_v,
@@ -134,6 +134,7 @@ def remesh(image: np.ndarray,
                                               # chiDiscAtPi=self.chiDiscAtPi,
                                               # empty=dummy if dummy is not None else self._empty
                                               )
+    q_h, q_v = np.meshgrid(q_h, q_v)
     return I, q_h, q_v
 
 
