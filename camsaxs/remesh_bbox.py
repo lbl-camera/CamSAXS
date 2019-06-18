@@ -21,9 +21,12 @@ from pyFAI import units
 
 def q_from_angles(phi, alpha, wavelength):
     r = 2 * np.pi / wavelength
+    # qx = r * np.sin(phi) * np.cos(alpha)
+    # qy = r * np.cos(phi) * np.sin(alpha)
+    # qz = r * (np.cos(phi) * np.cos(alpha) - 1)
     qx = r * np.sin(phi) * np.cos(alpha)
-    qy = r * np.cos(phi) * np.sin(alpha)
-    qz = r * (np.cos(phi) * np.cos(alpha) - 1)
+    qy = r * np.sin(alpha)
+    qz = r * np.cos(alpha) * np.cos(alpha) - 1
 
     return np.array([qx, qy, qz])
 
@@ -33,7 +36,7 @@ def alpha(x, y, z):
 
 
 def phi(x, y, z):
-    return np.arctan2(x, np.sqrt(y ** 2 + z ** 2))
+    return np.arctan2(x, np.sqrt(z ** 2))
 
 
 def test_show(data, log=True):
@@ -106,11 +109,11 @@ def remesh(image: np.ndarray,
         alphas = alpha(r_x, r_y, r_z)
         phis = phi(r_x, r_y, r_z)
 
-        q_x, q_y, q_z = q_from_angles(phis, alphas, geometry.wavelength)*1e-10
-        q_v = q_y
+        q_x, q_y, q_z = q_from_angles(phis, alphas, geometry.wavelength) * 1e-10
+        q_v = -q_y  # -q_y
         q_h = q_x
 
-    if bins is None: bins = image.shape
+    if bins is None: bins = tuple(image.shape)
     if q_h_range is None: q_h_range = (q_h.min(), q_h.max())
     if q_v_range is None: q_v_range = (q_v.min(), q_v.max())
 
