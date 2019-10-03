@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from .remesh import remesh
+from .remesh_bbox import remesh
 from .cwt import cwt2d
 from .factory import XicamSASModel
 from .fit_sasmodel import fit_sasmodel
