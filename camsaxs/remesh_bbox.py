@@ -20,13 +20,10 @@ from pyFAI import units
 
 
 def q_from_angles(phi, alpha, wavelength):
-    r = 2 * np.pi / wavelength
-    # qx = r * np.sin(phi) * np.cos(alpha)
-    # qy = r * np.cos(phi) * np.sin(alpha)
-    # qz = r * (np.cos(phi) * np.cos(alpha) - 1)
-    qx = r * np.sin(phi) * np.cos(alpha)
-    qy = r * np.sin(alpha)
-    qz = r * np.cos(alpha) * np.cos(alpha) - 1
+    r = 4 * np.pi / wavelength
+    qx = r * np.sin(phi/2) * np.cos(alpha/2)
+    qy = r * np.sin(alpha/2)
+    qz = r * np.cos(alpha/2) * np.cos(alpha/2) - 1
 
     return np.array([qx, qy, qz])
 
