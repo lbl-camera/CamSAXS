@@ -114,14 +114,17 @@ def remesh(image: np.ndarray,
     if q_h_range is None: q_h_range = (q_h.min(), q_h.max())
     if q_v_range is None: q_v_range = (q_v.min(), q_v.max())
 
+    # Note: dividing q values by 10 so that the q map is within the bounds allowed by histoBBox2d
     I, q_h, q_v, _, _ = splitBBox.histoBBox2d(weights=image,
-                                              pos0=q_h,
-                                              delta_pos0=np.ones_like(image) * (q_h_range[1] - q_h_range[0]) / bins[0],
-                                              pos1=q_v,
-                                              delta_pos1=np.ones_like(image) * (q_v_range[1] - q_v_range[0]) / bins[1],
+                                              pos0=q_h / 10,
+                                              delta_pos0=np.ones_like(image) * (q_h_range[1] - q_h_range[0]) / bins[
+                                                  0] / 10,
+                                              pos1=q_v / 10,
+                                              delta_pos1=np.ones_like(image) * (q_v_range[1] - q_v_range[0]) / bins[
+                                                  1] / 10,
                                               bins=bins,
-                                              pos0Range=q_h_range,
-                                              pos1Range=q_v_range,
+                                              pos0Range=np.asarray(q_h_range) / 10,
+                                              pos1Range=np.asarray(q_v_range) / 10,
                                               dummy=None,
                                               delta_dummy=None,
                                               allow_pos0_neg=True,
@@ -135,7 +138,7 @@ def remesh(image: np.ndarray,
                                               # empty=dummy if dummy is not None else self._empty
                                               )
     q_h, q_v = np.meshgrid(q_h, q_v)
-    return I, q_h, q_v
+    return I.T, q_h * 10, q_v * 10
 
 
 if __name__ == '__main__':
