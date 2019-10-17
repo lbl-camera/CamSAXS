@@ -138,7 +138,7 @@ def remesh(image: np.ndarray,
                                               # empty=dummy if dummy is not None else self._empty
                                               )
     q_h, q_v = np.meshgrid(q_h, q_v)
-    return I.T, q_h * 10, q_v * 10
+    return np.flipud(I), np.flipud(q_h * 10), np.flipud(q_v * 10)
 
 
 if __name__ == '__main__':
@@ -172,3 +172,6 @@ if __name__ == '__main__':
     # default qp-qz, same size as detector
     I, q_h, q_v = remesh(data, g, False, 0)  # img, x, y =
     test_show(I)
+
+    test_show(q_h, log=False)
+    test_show(q_v, log=False)
