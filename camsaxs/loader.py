@@ -40,7 +40,7 @@ def load_models():
         return None
 
     with open(config) as fp:
-        yml = yaml.load(fp)
+        yml = yaml.load(fp, Loader=yaml.Loader)
 
     model_tree = OrderedDict()
     for key, val in yml.items():
