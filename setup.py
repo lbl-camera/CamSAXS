@@ -10,5 +10,6 @@ if __name__ == '__main__':
           url="http://github.com/lbl-camera/CamSAXS",
           install_requires = ['numpy', 'scipy', 'astropy', 'pyFAI', 'sasmodels', 'pyyaml'],
           packages = ['camsaxs'],
-          data_files=[('camsaxs', ['camsaxs/config.yml'])]
+          include_package_data = True,
+          package_data={'camsaxs': ['camsaxs/config.yml']}
           )
